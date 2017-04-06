@@ -75,12 +75,12 @@ The final choice of parameters is in the code cell under "Global Parameters".
 
 I trained a linear SVM using just HOG Features as it was enough to properly differentiate between `vehicles` and `non-vehicles`. The training logic can be found under the section "Training the Classifier". Here are the steps followed:
 
-**1. Extract features for cars and not cars
-**2. Apply StandardScaler to features
-**3. Define labels vectors with '1's for cars and '0's for non-cars
-**4. Split data into training and testing - 20% for testing and randomize the data
-**5. Use a Linear Support Vector Machines Classifier to train data
-**6. Print Accuracy
+1. Extract features for cars and not cars
+2. Apply StandardScaler to features
+3. Define labels vectors with '1's for cars and '0's for non-cars
+4. Split data into training and testing - 20% for testing and randomize the data
+5. Use a Linear Support Vector Machines Classifier to train data
+6. Print Accuracy
 
 The final feature vector length with `9 orientations`, `8 pixels per cell` and `2 cells per block` had `5292` feature vectors. It took just less than `17sec` to train the classifier and the accuracy came up to `98.17%` which is pretty good. Here is the final output:
 
@@ -119,8 +119,6 @@ Ultimately I searched on just one scale using `YCrCb` `ALL`-channel HOG features
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
 
 Here's a [link to my video result](./project_video_output.mp4)
-
-![alt text][video1]
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
