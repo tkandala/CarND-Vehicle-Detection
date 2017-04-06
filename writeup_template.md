@@ -16,10 +16,12 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 [image1]: ./test_images/test4.jpg "Test Image"
-[image2]: ./output_images/test4_result.png "Vehicles Detected"
-[image3]: ./output_images/test4_plot.png "Vehicle Detection Plot"
+[image2]: ./output_images/test4_result.png "Vehicles Detected 1"
+[image3]: ./output_images/test4_plot.png "Vehicle Detection Plot 1"
 [image4]: ./output_images/test_images_plot.png "Vehicle Classes"
 [image5]: ./output_images/hog_image_plot.png "Hog Image"
+[image6]: ./output_images/test5_result.png "Vehicles Detected 2"
+[image7]: ./output_images/test5_plot.png "Vehicle Detection Plot 2"
 [video1]: ./project_video_output.mp4 "Output Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
@@ -40,14 +42,14 @@ The code for this step is contained in the code cell under the title "Training t
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
-![Vehicle Classes][image4]
+![alt text][image4]
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
-![Hog Image][image5]
+![alt text][image5]
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
@@ -69,13 +71,17 @@ I decided to search random window positions at random scales all over the image 
 
 Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
-![alt text][image4]
+![alt text][image1]
+![alt text][image2]
+![alt text][image3]
+![alt text][image6]
+![alt text][image7]
 ---
 
 ### Video Implementation
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_output.mp4)
 
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
