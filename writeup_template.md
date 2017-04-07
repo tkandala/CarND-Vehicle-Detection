@@ -20,10 +20,9 @@ The goals / steps of this project are the following:
 [image3]: ./output_images/test4_plot.png "Vehicle Detection Plot 1"
 [image4]: ./output_images/test_images_plot.png "Vehicle Classes"
 [image5]: ./output_images/hog_image_plot.png "Hog Image"
-[image6]: ./output_images/test5_result.png "Vehicles Detected 2"
-[image7]: ./output_images/test5_plot.png "Vehicle Detection Plot 2"
-[image8]: ./output_images/slide_windows.png "Slide Windows"
-[image9]: ./output_images/video_clip_false_positive.png "False positive"
+[image6]: ./output_images/slide_windows.png "Slide Windows"
+[image7]: ./output_images/video_clip_false_positive.png "False positive"
+[image8]: ./output_images/find_cars.png "Area searched for slide windows"
 [video1]: ./project_video_output.mp4 "Output Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
@@ -79,17 +78,20 @@ I trained a linear SVM using just HOG Features as it was enough to properly diff
 2. Apply StandardScaler to features
 3. Define labels vectors with '1's for cars and '0's for non-cars
 4. Split data into training and testing - 20% for testing and randomize the data
-5. Use a Linear Support Vector Machines Classifier to train data
+5. Use a Linear SVM Classifier to train data and apply GridSearchCV() to obtain the best 'C' value
 6. Print Accuracy
 
-The final feature vector length with `9 orientations`, `8 pixels per cell` and `2 cells per block` had `5292` feature vectors. It took just less than `17sec` to train the classifier and the accuracy came up to `98.17%` which is pretty good. Here is the final output:
+The final feature vector length with `9 orientations`, `8 pixels per cell` and `2 cells per block` had `5292` feature vectors. It took about a minute to train the classifier and the accuracy came up to `97.78%%` which is pretty good. Here is the final output:
 
 ```
 Using: 9 orientations 8 pixels per cell and 2 cells per block
 Feature vector length: 5292
-16.65 Seconds to train SVC...
-Test Accuracy of SVC =  0.9817
+61.27 Seconds to train SVC...
+Test Accuracy of SVC =  0.9778
+Best Parameters chosen =  {'C': 1}
 ```
+
+I have used `sklearn.model_selection.GridSearchCV` with the `C : [1, 10]` parameter to find the best `C` value to tune the Linear SVM classifier. In the end, `C:1` was the bext parameter.
 
 ### Sliding Window Search
 
@@ -99,19 +101,16 @@ The sliding window search is implemented inside the function `slide_window()` sa
 
 For the amount of overlap, I used the default `50%` overlap as used inside lecture notes. It was a good overlap to start with.
 
-Regarding the scales, I first started with just a scale of `1.0` and found out that the scale was enough to identify cars over `90%` of the time inside the images. This was good enough to proceed forward so I decided not to implement any additional scales.
-
-![alt text][image8]
+Regarding the scales, I first started with just a scale of `1.0` and found out that the scale was enough to identify cars over `90%` of the time inside the images. This scale was giving very few windows of identified cars and as mentioned, 10% of the time, the cars were not getting identified. I therefore used a set of scales `[1, 1.5, 2, 2.5]. This set gave a good amount of search windows for the identified cars - along with some false positives. Finally, using a heat threshold of `4` I was able to cleanly remove the false positives.
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on just one scale using `YCrCb` `ALL`-channel HOG features, which provided a nice result.  Here are some example images:
+To optimize the performance of the classifier (already mentioned above), I used the `sklearn.model_selection.GridSearchCV` to fine tune the `LinearSVM` classifier. Because we are using a linear classifier, we can only play around with the `C` parameter (as mentioned inside lecture notes). 
 
-![alt text][image1]
-![alt text][image2]
+Also as mentioned earlier, I used just the HOG features to train my classifier as it was good enough to give a great accuracy on the test data. I used `ALL` HOG channels and a `YCrCb` color space. You can see the final heatmap of one of the test images here after applying multiple scales and calculating the list of windows on just HOG features:
+
 ![alt text][image3]
-![alt text][image6]
-![alt text][image7]
+
 ---
 
 ### Video Implementation
@@ -120,17 +119,15 @@ Ultimately I searched on just one scale using `YCrCb` `ALL`-channel HOG features
 
 Here's a [link to my video result](./project_video_output.mp4)
 
+As you can see, multiple scales `[1, 1.5, 2, 2.5]` were applied for performing a window search for vehicles. This significantly increased the number of true positives but also added few false positives which were handled by the heat threshold.
+
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
 I have started with defining the functions `add_heat()`, `apply_threshold()` and `draw_labeled_bboxes()` under the title "Heat threshold to an image to filter false positives" in the ipython notebook. These are the same functions as in the lecture notes that will help get the heatmap of an image.
 
-One thing I have noticed is that the number of `hot_windows` I got as the output from `search_windows()` function is that the number of false positives were negligible in the complete video. The false positives are actually cars identified on the other side of the highway so they are not the ones pointing to the road or trees. You can see an example below:
+Apart from applying multiple scales and heat threshold, I have also implemented a smoothing mechanism that will get a list of all search windows for a set of 6 consecutive video frames and makes an average heatmap that can later be used to further filter out any false negatives. This logic is present inside the cell below `Define pipeline for the video` title. I have used 2 `collections.deque` variables `hot_windows_queue` and `hot_windows_set_count`. The `hot_windows_queue` variable keeps a list of all windows that came positive in car search. The list includes the list of windows only from the last 6 frames. To keep a count of how many windows were added at each video frame, I used the `hot_windows_set_count` variable to track these numbers. Starting 7th frame, I remove the list of windows that were added inside `hot_windows_queue` first. This follows the FIFO model of a queue data structure.
 
-![alt text][image9]
-
-Also, looking at one of the test images (below), we see that the heatmap for the identified cars will filter out even true positives. Also keeping in mind that the false positives are really not "true" false positives and the occurence is not frequent, I decided to not apply a filter or heat threshold to the images.
-
-![alt text][image7]
+Also, to properly tune the heatmap threshold parameter, I took a clip of the project_video.mp4 named [part_clip.mov](./part_clip.mov) and fine tuned my algorithm along with the parameters. The final result of this clip is in the [part_clip_output.mp4](./part_clip_output.mp4) file.
 
 ---
 
@@ -142,7 +139,6 @@ Here I'll talk about the approach I took, what techniques I used, what worked an
 
 So as mentioned earlier, I spent some time going through the [HOG research paper](http://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) and tried to use the same parameters as discussed. The only variation from these parameters to the ones I chose was the color space - `YCrCb` instead of `RGB`. The reason being that I got a lot of false positives with using an `RGB` color space - keeping all other parameters same. Because of the number of false positives, I tried to implement a heat threshold filter including the multiple scales solution, I wasn't able to completely filter out the false positives. In many cases, it was filtering out the cars before the false positives. `YCrCb` gave a much better solution.
 
-I haven't implemented a smoothing algorithm that will take an average of all windows in a series of video frames and add a single window (along with threshold) because I think the current solution was good enough to showcase that the chosen parameters were enough to detect vehicles most of the times during the video. But adding a smoothing algorithm will definetely make it a cleaner vehicle detection algorithm, also eliminating any existing false positives.
-
+Further improvements could involve a much bigger training dataset that gives the classifier a better prediction on what is a car and non-car. 
 
 
