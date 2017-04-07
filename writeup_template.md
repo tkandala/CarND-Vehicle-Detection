@@ -20,7 +20,7 @@ The goals / steps of this project are the following:
 [image3]: ./output_images/test4_plot.png "Vehicle Detection Plot 1"
 [image4]: ./output_images/test_images_plot.png "Vehicle Classes"
 [image5]: ./output_images/hog_image_plot.png "Hog Image"
-[image6]: ./output_images/slide_windows.png "Slide Windows"
+[image6]: ./output_images/test4_plot_1.png "result of multiple scales"
 [image7]: ./output_images/video_clip_false_positive.png "False positive"
 [image8]: ./output_images/find_cars.png "Area searched for slide windows"
 [video1]: ./project_video_output.mp4 "Output Video"
@@ -97,11 +97,17 @@ I have used `sklearn.model_selection.GridSearchCV` with the `C : [1, 10]` parame
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-The sliding window search is implemented inside the function `slide_window()` same as the one mentioned inside lecture notes. This function returns the list of windows given the start and stop positions in `x` and `y`, the size of the window and the overlap. I have settled on a window size of `64x64` after trying other combinations like `96x96` like in the lecture notes. I found out that `64x64` gave a pretty good prediction whereas `96x96` was only good when the cars were a bit closer to the vehicle. For this project `64x64` seemed like a good option to settle on.
+The sliding window search is implemented inside the function `slide_window()` same as the one mentioned inside lecture notes. This function returns the list of windows given the start and stop positions in `x` and `y`, the size of the window and the overlap. I have settled on a window size of `64x64` after trying other combinations like `96x96` like in the lecture notes. I found out that `64x64` gave a pretty good prediction whereas `96x96` was only good when the cars were a bit closer to the vehicle. For this project `64x64` seemed like a good option to settle on. Below is the part of the image used for `sliding_windows()` function:
+
+![alt text][image8]
 
 For the amount of overlap, I used the default `50%` overlap as used inside lecture notes. It was a good overlap to start with.
 
-Regarding the scales, I first started with just a scale of `1.0` and found out that the scale was enough to identify cars over `90%` of the time inside the images. This scale was giving very few windows of identified cars and as mentioned, 10% of the time, the cars were not getting identified. I therefore used a set of scales `[1, 1.5, 2, 2.5]. This set gave a good amount of search windows for the identified cars - along with some false positives. Finally, using a heat threshold of `4` I was able to cleanly remove the false positives.
+Regarding the scales, I first started with just a scale of `1.0` and found out that the scale was enough to identify cars over `90%` of the time inside the images. This scale was giving very few windows of identified cars and as mentioned, 10% of the time, the cars were not getting identified. I therefore used a set of scales `[1, 1.5, 2, 2.5]`. This set gave a good amount of search windows for the identified cars - along with some false positives. Finally, using a heat threshold of `4` I was able to cleanly remove the false positives.
+
+Here is the image with all the positive windows with multiple scales - and before the heat threshold step:
+
+![alt text][image6]
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
